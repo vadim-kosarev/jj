@@ -19,4 +19,12 @@ Or via HTTP:
 curl 'http://clickhouse.starlight:8123/?query=SELECT%201'
 ```
 
+## Tabix Web Interface
+
+Tabix provides a web-based UI for querying ClickHouse.
+
+Access Tabix at: `http://localhost:8080`
+
+It connects to the local ClickHouse instance.
+
 The cluster is configured for sharding and replication across the two nodes.

@@ -19,5 +19,18 @@ services:
     networks:
       - docker-network
 
+  tabix:
+    image: tabixio/tabix:latest
+    container_name: tabix-${CLICKHOUSE_NODE_LOWER}
+    ports:
+      - "8080:80"
+    environment:
+      - CLICKHOUSE_HOST=${CLICKHOUSE_HOSTNAME}
+      - CLICKHOUSE_PORT=8123
+    depends_on:
+      - clickhouse
+    networks:
+      - docker-network
+
 networks:
   docker-network:
