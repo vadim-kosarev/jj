@@ -20,7 +20,7 @@ services:
       - docker-network
 
   tabix:
-    image: spiralscout/tabix:latest
+    image: spoonest/clickhouse-tabix-web-client:stable
     container_name: tabix-${CLICKHOUSE_NODE_LOWER}
     ports:
       - "8022:80"
