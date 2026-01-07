@@ -1,0 +1,23 @@
+version: '3.8'
+
+name: jj
+
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse-${CLICKHOUSE_NODE_LOWER}
+    hostname: ${CLICKHOUSE_HOSTNAME}
+    ports:
+      - "${CLICKHOUSE_PORT_HTTP}:8123"
+      - "${CLICKHOUSE_PORT_TCP}:9000"
+    volumes:
+      - ${CLICKHOUSE_CONFIG_DIR}/config.xml:/etc/clickhouse-server/config.xml
+      - ${CLICKHOUSE_CONFIG_DIR}/users.xml:/etc/clickhouse-server/users.xml
+      - ${CLICKHOUSE_VOLUME_PATH}:/var/lib/clickhouse
+    env_file:
+      - .env
+    networks:
+      - docker-network
+
+networks:
+  docker-network:

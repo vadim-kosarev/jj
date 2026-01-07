@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<yandex>
+    <macros>
+        <shard>02</shard>
+        <replica>brightsky</replica>
+    </macros>
+    <remote_servers>
+        <my_cluster>
+            <shard>
+                <internal_replication>true</internal_replication>
+                <replica>
+                    <host>clickhouse-starlight</host>
+                    <port>9000</port>
+                </replica>
+            </shard>
+            <shard>
+                <internal_replication>true</internal_replication>
+                <replica>
+                    <host>clickhouse-brightsky</host>
+                    <port>9000</port>
+                </replica>
+            </shard>
+        </my_cluster>
+    </remote_servers>
+    <listen_host>0.0.0.0</listen_host>
+    <http_port>8123</http_port>
+    <tcp_port>9000</tcp_port>
+</yandex>
+
