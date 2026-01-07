@@ -2,7 +2,7 @@
 <yandex>
     <users>
         <default>
-            <password_sha256_hex>ef61a577c907bbed674c0dbcbcf7f7af8f549815dc85431cb9e0b47c4a9b168ad</password_sha256_hex>
+            <password>default</password>
             <networks>
                 <ip>::/0</ip>
             </networks>
