@@ -9,23 +9,23 @@
             <shard>
                 <internal_replication>true</internal_replication>
                 <replica>
-                    <host>clickhouse-starlight-01</host>
+                    <host>starlight</host>
                     <port>9000</port>
                 </replica>
                 <replica>
-                    <host>clickhouse-brightsky-01</host>
-                    <port>9000</port>
+                    <host>brightsky</host>
+                    <port>9002</port>
                 </replica>
             </shard>
             <shard>
                 <internal_replication>true</internal_replication>
                 <replica>
-                    <host>clickhouse-starlight-02</host>
-                    <port>9000</port>
+                    <host>starlight</host>
+                    <port>9001</port>
                 </replica>
                 <replica>
-                    <host>clickhouse-brightsky-02</host>
-                    <port>9000</port>
+                    <host>brightsky</host>
+                    <port>9003</port>
                 </replica>
             </shard>
         </my_cluster>
