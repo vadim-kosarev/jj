@@ -2,7 +2,7 @@
 <yandex>
     <macros>
         <shard>01</shard>
-        <replica>starlight</replica>
+        <replica>01</replica>
     </macros>
     <remote_servers>
         <my_cluster>
@@ -12,9 +12,6 @@
                     <host>clickhouse-starlight</host>
                     <port>9000</port>
                 </replica>
-            </shard>
-            <shard>
-                <internal_replication>true</internal_replication>
                 <replica>
                     <host>clickhouse-brightsky</host>
                     <port>9000</port>
