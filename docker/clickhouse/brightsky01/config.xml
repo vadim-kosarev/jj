@@ -9,22 +9,22 @@
             <shard>
                 <internal_replication>true</internal_replication>
                 <replica>
-                    <host>starlight</host>
+                    <host>clickhouse-starlight-01</host>
                     <port>9000</port>
                 </replica>
                 <replica>
-                    <host>brightsky</host>
+                    <host>clickhouse-brightsky-01</host>
                     <port>9002</port>
                 </replica>
             </shard>
             <shard>
                 <internal_replication>true</internal_replication>
                 <replica>
-                    <host>starlight</host>
+                    <host>clickhouse-starlight-02</host>
                     <port>9001</port>
                 </replica>
                 <replica>
-                    <host>brightsky</host>
+                    <host>clickhouse-brightsky-02</host>
                     <port>9003</port>
                 </replica>
             </shard>
@@ -48,4 +48,3 @@
     <http_port>8123</http_port>
     <tcp_port>9000</tcp_port>
 </yandex>
-
