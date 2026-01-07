@@ -20,7 +20,7 @@ services:
       - docker-network
 
   tabix:
-    image: tabixio/tabix:latest
+    image: spiralscout/tabix:latest
     container_name: tabix-${CLICKHOUSE_NODE_LOWER}
     ports:
       - "8022:80"
