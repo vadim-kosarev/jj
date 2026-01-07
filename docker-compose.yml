@@ -6,7 +6,7 @@ services:
   clickhouse-01:
     image: clickhouse/clickhouse-server:latest
     container_name: clickhouse-${CLICKHOUSE_NODE_LOWER}-01
-    hostname: clickhouse.${CLICKHOUSE_NODE_LOWER}.01
+    hostname: ${CLICKHOUSE_HOSTNAME}-01
     ports:
       - "${CLICKHOUSE_PORT_HTTP_01}:8123"
       - "${CLICKHOUSE_PORT_TCP_01}:9000"
@@ -22,7 +22,7 @@ services:
   clickhouse-02:
     image: clickhouse/clickhouse-server:latest
     container_name: clickhouse-${CLICKHOUSE_NODE_LOWER}-02
-    hostname: clickhouse.${CLICKHOUSE_NODE_LOWER}.02
+    hostname: ${CLICKHOUSE_HOSTNAME}-02
     ports:
       - "${CLICKHOUSE_PORT_HTTP_02}:8123"
       - "${CLICKHOUSE_PORT_TCP_02}:9000"
@@ -32,20 +32,6 @@ services:
       - ${CLICKHOUSE_VOLUME_PATH_02}:/var/lib/clickhouse
     env_file:
       - .env
-    networks:
-      - docker-network
-
-  tabix:
-    image: spoonest/clickhouse-tabix-web-client:stable
-    container_name: tabix-${CLICKHOUSE_NODE_LOWER}
-    ports:
-      - "8022:80"
-    environment:
-      - CLICKHOUSE_HOST=clickhouse.${CLICKHOUSE_NODE_LOWER}.01
-      - CLICKHOUSE_PORT=8123
-    depends_on:
-      - clickhouse-01
-      - clickhouse-02
     networks:
       - docker-network
 
