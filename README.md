@@ -23,7 +23,7 @@ curl 'http://clickhouse.starlight:8123/?query=SELECT%201'
 
 Tabix provides a web-based UI for querying ClickHouse.
 
-Access Tabix at: `http://localhost:8080`
+Access Tabix at: `http://localhost:8022`
 
 It connects to the local ClickHouse instance.
 

@@ -23,7 +23,7 @@ services:
     image: tabixio/tabix:latest
     container_name: tabix-${CLICKHOUSE_NODE_LOWER}
     ports:
-      - "8080:80"
+      - "8022:80"
     environment:
       - CLICKHOUSE_HOST=${CLICKHOUSE_HOSTNAME}
       - CLICKHOUSE_PORT=8123
