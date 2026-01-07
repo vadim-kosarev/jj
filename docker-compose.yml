@@ -19,18 +19,5 @@ services:
     networks:
       - docker-network
 
-  tabix:
-    image: spoonest/clickhouse-tabix-web-client:stable
-    container_name: tabix-${CLICKHOUSE_NODE_LOWER}
-    ports:
-      - "8022:80"
-    environment:
-      - CLICKHOUSE_HOST=${CLICKHOUSE_HOSTNAME}
-      - CLICKHOUSE_PORT=8123
-    depends_on:
-      - clickhouse
-    networks:
-      - docker-network
-
 networks:
   docker-network:
