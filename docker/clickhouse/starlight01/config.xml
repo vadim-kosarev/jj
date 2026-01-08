@@ -72,4 +72,5 @@
         <cleanup_delay_period>60</cleanup_delay_period>
         <max_tasks_in_queue>1000</max_tasks_in_queue>
     </distributed_ddl>
+    <distributed_ddl_task_enabled>1</distributed_ddl_task_enabled>
 </yandex>
