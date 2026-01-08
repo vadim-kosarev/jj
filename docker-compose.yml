@@ -4,7 +4,7 @@ services:
   clickhouse-01:
     image: clickhouse/clickhouse-server:latest
     container_name: clickhouse-${CLICKHOUSE_NODE_LOWER}-01
-    hostname: ${CLICKHOUSE_HOSTNAME}-01
+    hostname: ${CLICKHOUSE_HOSTNAME}-01.internal
     ports:
       - "${CLICKHOUSE_PORT_HTTP_01}:8123"
       - "${CLICKHOUSE_PORT_TCP_01}:9000"
@@ -22,7 +22,7 @@ services:
   clickhouse-02:
     image: clickhouse/clickhouse-server:latest
     container_name: clickhouse-${CLICKHOUSE_NODE_LOWER}-02
-    hostname: ${CLICKHOUSE_HOSTNAME}-02
+    hostname: ${CLICKHOUSE_HOSTNAME}-02.internal
     ports:
       - "${CLICKHOUSE_PORT_HTTP_02}:8123"
       - "${CLICKHOUSE_PORT_TCP_02}:9000"
