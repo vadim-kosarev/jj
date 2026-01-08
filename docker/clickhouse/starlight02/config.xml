@@ -6,7 +6,7 @@
     </macros>
     <zookeeper>
         <node>
-            <host>zookeeper.ext</host>
+            <host>zookeeper</host>
             <port>2181</port>
         </node>
         <session_timeout_ms>30000</session_timeout_ms>
@@ -17,23 +17,23 @@
             <shard>
                 <internal_replication>true</internal_replication>
                 <replica>
-                    <host>clickhouse-starlight-01.ext</host>
+                    <host>clickhouse-starlight-01</host>
                     <port>9000</port>
                 </replica>
                 <replica>
-                    <host>clickhouse-brightsky-01.ext</host>
-                    <port>9002</port>
+                    <host>clickhouse-brightsky-01</host>
+                    <port>9000</port>
                 </replica>
             </shard>
             <shard>
                 <internal_replication>true</internal_replication>
                 <replica>
-                    <host>clickhouse-starlight-02.ext</host>
-                    <port>9001</port>
+                    <host>clickhouse-starlight-02</host>
+                    <port>9000</port>
                 </replica>
                 <replica>
-                    <host>clickhouse-brightsky-02.ext</host>
-                    <port>9003</port>
+                    <host>clickhouse-brightsky-02</host>
+                    <port>9000</port>
                 </replica>
             </shard>
         </my_cluster>
@@ -57,7 +57,7 @@
     <tcp_port>9000</tcp_port>
     <interserver_listen_host>0.0.0.0</interserver_listen_host>
     <interserver_http_port>9009</interserver_http_port>
-    <interserver_http_host>clickhouse-starlight-02.ext</interserver_http_host>
+    <interserver_http_host>clickhouse-starlight-02</interserver_http_host>
     <opentelemetry>
         <endpoint>grpc://otel-collector.rgzz:4317</endpoint>
         <service_name>clickhouse-starlight-02</service_name>

@@ -25,17 +25,16 @@ services:
 
   clickhouse-01:
     image: clickhouse/clickhouse-server:latest
-    container_name: clickhouse-${CLICKHOUSE_NODE_LOWER}-01
-    hostname: ${CLICKHOUSE_HOSTNAME}-01.internal
+    container_name: clickhouse-starlight-01
+    hostname: clickhouse-starlight-01
     ports:
-      - "${CLICKHOUSE_PORT_HTTP_01}:8123"
-      - "${CLICKHOUSE_PORT_TCP_01}:9000"
+      - "8123:8123"
+      - "9000:9000"
     volumes:
       - ${CLICKHOUSE_CONFIG_DIR_01}/config.xml:/etc/clickhouse-server/config.xml
       - ${CLICKHOUSE_CONFIG_DIR_01}/users.xml:/etc/clickhouse-server/users.xml
       - ${CLICKHOUSE_CONFIG_DIR_01}/users.d:/etc/clickhouse-server/users.d
       - ${CLICKHOUSE_CONFIG_DIR_01}/init.sql:/docker-entrypoint-initdb.d/init.sql
-#      - ${CLICKHOUSE_VOLUME_PATH_01}:/var/lib/clickhouse
       - clickhouse_data_01:/var/lib/clickhouse
     env_file:
       - .env
@@ -44,20 +43,51 @@ services:
 
   clickhouse-02:
     image: clickhouse/clickhouse-server:latest
-    container_name: clickhouse-${CLICKHOUSE_NODE_LOWER}-02
-    hostname: ${CLICKHOUSE_HOSTNAME}-02.internal
+    container_name: clickhouse-starlight-02
+    hostname: clickhouse-starlight-02
     ports:
-      - "${CLICKHOUSE_PORT_HTTP_02}:8123"
-      - "${CLICKHOUSE_PORT_TCP_02}:9000"
+      - "8124:8123"
+      - "9001:9000"
     volumes:
       - ${CLICKHOUSE_CONFIG_DIR_02}/config.xml:/etc/clickhouse-server/config.xml
       - ${CLICKHOUSE_CONFIG_DIR_02}/users.xml:/etc/clickhouse-server/users.xml
       - ${CLICKHOUSE_CONFIG_DIR_02}/users.d:/etc/clickhouse-server/users.d
       - ${CLICKHOUSE_CONFIG_DIR_02}/init.sql:/docker-entrypoint-initdb.d/init.sql
-      #      - ${CLICKHOUSE_VOLUME_PATH_01}:/var/lib/clickhouse
       - clickhouse_data_02:/var/lib/clickhouse
     env_file:
       - .env
+    networks:
+      - docker-network
+
+  clickhouse-03:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse-brightsky-01
+    hostname: clickhouse-brightsky-01
+    ports:
+      - "8125:8123"
+      - "9002:9000"
+    volumes:
+      - ./docker/clickhouse/brightsky01/config.xml:/etc/clickhouse-server/config.xml
+      - ./docker/clickhouse/brightsky01/users.xml:/etc/clickhouse-server/users.xml
+      - ./docker/clickhouse/brightsky01/users.d:/etc/clickhouse-server/users.d
+      - ./docker/clickhouse/brightsky01/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - clickhouse_data_03:/var/lib/clickhouse
+    networks:
+      - docker-network
+
+  clickhouse-04:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse-brightsky-02
+    hostname: clickhouse-brightsky-02
+    ports:
+      - "8126:8123"
+      - "9003:9000"
+    volumes:
+      - ./docker/clickhouse/brightsky02/config.xml:/etc/clickhouse-server/config.xml
+      - ./docker/clickhouse/brightsky02/users.xml:/etc/clickhouse-server/users.xml
+      - ./docker/clickhouse/brightsky02/users.d:/etc/clickhouse-server/users.d
+      - ./docker/clickhouse/brightsky02/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - clickhouse_data_04:/var/lib/clickhouse
     networks:
       - docker-network
 
@@ -70,3 +100,6 @@ volumes:
   zookeeper_logs:
   clickhouse_data_01:
   clickhouse_data_02:
+  clickhouse_data_03:
+  clickhouse_data_04:
+
