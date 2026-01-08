@@ -62,4 +62,14 @@
         <endpoint>grpc://otel-collector.rgzz:4317</endpoint>
         <service_name>clickhouse-brightsky-01</service_name>
     </opentelemetry>
+    <distributed_ddl>
+        <!-- Path in ZooKeeper to queue with DDL queries -->
+        <path>/clickhouse/task_queue/ddl</path>
+
+        <!-- Optional settings (можно добавить для стабильности) -->
+        <profile>default</profile>
+        <task_max_lifetime>604800</task_max_lifetime> <!-- 7 дней -->
+        <cleanup_delay_period>60</cleanup_delay_period>
+        <max_tasks_in_queue>1000</max_tasks_in_queue>
+    </distributed_ddl>
 </yandex>
