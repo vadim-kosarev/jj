@@ -32,7 +32,8 @@ services:
       - ${CLICKHOUSE_CONFIG_DIR_01}/users.xml:/etc/clickhouse-server/users.xml
       - ${CLICKHOUSE_CONFIG_DIR_01}/users.d:/etc/clickhouse-server/users.d
       - ${CLICKHOUSE_CONFIG_DIR_01}/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ${CLICKHOUSE_VOLUME_PATH_01}:/var/lib/clickhouse
+#      - ${CLICKHOUSE_VOLUME_PATH_01}:/var/lib/clickhouse
+      - clickhouse_data_01:/var/lib/clickhouse
     env_file:
       - .env
     networks:
@@ -50,7 +51,8 @@ services:
       - ${CLICKHOUSE_CONFIG_DIR_02}/users.xml:/etc/clickhouse-server/users.xml
       - ${CLICKHOUSE_CONFIG_DIR_02}/users.d:/etc/clickhouse-server/users.d
       - ${CLICKHOUSE_CONFIG_DIR_02}/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ${CLICKHOUSE_VOLUME_PATH_02}:/var/lib/clickhouse
+      #      - ${CLICKHOUSE_VOLUME_PATH_01}:/var/lib/clickhouse
+      - clickhouse_data_02:/var/lib/clickhouse
     env_file:
       - .env
     networks:
@@ -63,4 +65,5 @@ networks:
 volumes:
   zookeeper_data:
   zookeeper_logs:
-
+  clickhouse_data_01:
+  clickhouse_data_02:
