@@ -4,6 +4,12 @@
         <shard>02</shard>
         <replica>02</replica>
     </macros>
+    <zookeeper>
+        <node>
+            <host>zookeeper</host>
+            <port>2181</port>
+        </node>
+    </zookeeper>
     <remote_servers>
         <my_cluster>
             <shard>
