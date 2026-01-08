@@ -58,6 +58,10 @@
     <interserver_listen_host>0.0.0.0</interserver_listen_host>
     <interserver_http_port>9009</interserver_http_port>
     <interserver_http_host>clickhouse-starlight-01</interserver_http_host>
+    <interserver_http_credentials>
+        <user>clickhouse</user>
+        <password>clickhouse</password>
+    </interserver_http_credentials>
     <opentelemetry>
         <endpoint>grpc://otel-collector.rgzz:4317</endpoint>
         <service_name>clickhouse-starlight-01</service_name>
