@@ -14,6 +14,7 @@ services:
       - ${CLICKHOUSE_CONFIG_DIR_01}/config.xml:/etc/clickhouse-server/config.xml
       - ${CLICKHOUSE_CONFIG_DIR_01}/users.xml:/etc/clickhouse-server/users.xml
       - ${CLICKHOUSE_CONFIG_DIR_01}/users.d:/etc/clickhouse-server/users.d
+      - ${CLICKHOUSE_CONFIG_DIR_01}/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ${CLICKHOUSE_VOLUME_PATH_01}:/var/lib/clickhouse
     env_file:
       - .env
@@ -31,6 +32,7 @@ services:
       - ${CLICKHOUSE_CONFIG_DIR_02}/config.xml:/etc/clickhouse-server/config.xml
       - ${CLICKHOUSE_CONFIG_DIR_02}/users.xml:/etc/clickhouse-server/users.xml
       - ${CLICKHOUSE_CONFIG_DIR_02}/users.d:/etc/clickhouse-server/users.d
+      - ${CLICKHOUSE_CONFIG_DIR_02}/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ${CLICKHOUSE_VOLUME_PATH_02}:/var/lib/clickhouse
     env_file:
       - .env
