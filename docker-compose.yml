@@ -6,9 +6,12 @@ services:
     container_name: zookeeper
     ports:
       - "2181:2181"
+      - "2888:2888"
+      - "3888:3888"
     environment:
-      - ZOO_CFG_EXTRA="server.1=zookeeper:2888:3888"
+      - ZOO_CFG_EXTRA="server.1=0.0.0.0:2888:3888"
       - ZOO_MY_ID=1
+      - SERVER_JVMFLAGS=-Dzookeeper.serverCnxnSocket=org.apache.zookeeper.server.NettyServerCnxnFactory
     volumes:
       - zookeeper_data:/var/lib/zookeeper/data
       - zookeeper_logs:/var/log/zookeeper
