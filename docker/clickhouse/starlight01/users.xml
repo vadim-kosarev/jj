@@ -2,6 +2,7 @@
 <yandex>
     <users>
         <default>
+            <no_password/>
             <networks>
                 <ip>::/0</ip>
             </networks>
