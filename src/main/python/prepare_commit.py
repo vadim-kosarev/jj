@@ -119,8 +119,10 @@ def generate_commit_message(status: str, diff: str) -> str:
 
 def save_commit_info(status: str, diff: str, message: str) -> None:
     """Save commit information for reference."""
+    from datetime import datetime
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     info = f"""=== COMMIT INFO ===
-Generated: {subprocess.run('date', shell=True, capture_output=True, text=True).stdout.strip()}
+Generated: {current_time}
 
 === COMMIT MESSAGE ===
 {message}
