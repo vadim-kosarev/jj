@@ -65,7 +65,17 @@
     <opentelemetry>
         <endpoint>grpc://otel-collector.rgzz:4317</endpoint>
         <service_name>clickhouse-brightsky-01</service_name>
+        <log_queries>1</log_queries>
+        <log_processors>1</log_processors>
+        <protocol>grpc</protocol>
     </opentelemetry>
+    <metrics>
+        <prometheus>
+            <endpoint>/metrics</endpoint>
+            <port>9363</port>
+            <asynchronous_metrics_update_period_s>60</asynchronous_metrics_update_period_s>
+        </prometheus>
+    </metrics>
     <distributed_ddl>
         <!-- Path in ZooKeeper to queue with DDL queries -->
         <path>/clickhouse/task_queue/ddl</path>

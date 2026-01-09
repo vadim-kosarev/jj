@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS frigate.q_frigate_events_denorm
     `ingested_at` DateTime DEFAULT now()
 )
     ENGINE = ReplacingMergeTree()
-        ORDER BY (camera, start_time);
+        ORDER BY (message_hash);
 
 
 -- Materialized View for automatic JSON decomposition from raw events
