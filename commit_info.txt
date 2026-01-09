@@ -3,19 +3,13 @@ Generated: The current date is: 09.01.2026
 Enter the new date: (dd-mm-yy)
 
 === COMMIT MESSAGE ===
-Update ClickHouse schema: frigate_clickhouse_schema.sql
-Refactor core logic: 2 file(s)
+Refactor core logic: 1 file(s)
 Update documentation
-Minor updates: 6 file(s)
 
 === FILES CHANGED ===
-M  CLAUDE.md
-A  commit_run.log
-A  src/main/python/__pycache__/prepare_commit.cpython-312.pyc
-A  src/main/python/prepare_commit.py
-M  src/main/resources/frigate_clickhouse_schema.sql
-A  src/main/resources/saved_in_ch.json
+A  commit_info.txt
+M  src/main/python/prepare_commit.py
 
 
 === DIFF SUMMARY ===
-Lines changed: 850
+Lines changed: 43
