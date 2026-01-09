@@ -70,13 +70,16 @@
         <log_processors>1</log_processors>
         <protocol>grpc</protocol>
     </opentelemetry>
-    <metrics>
-        <prometheus>
-            <endpoint>/metrics</endpoint>
-            <port>9363</port>
-            <asynchronous_metrics_update_period_s>60</asynchronous_metrics_update_period_s>
-        </prometheus>
-    </metrics>
+    <prometheus>
+        <endpoint>/metrics</endpoint>
+        <port>9363</port>
+        <metrics>true</metrics>
+        <events>true</events>
+        <asynchronous_metrics>true</asynchronous_metrics>
+        <!-- Опционально, но полезно -->
+        <errors>true</errors>
+        <status_info>true</status_info>
+    </prometheus>
     <distributed_ddl>
         <!-- Path in ZooKeeper to queue with DDL queries -->
         <path>/clickhouse/task_queue/ddl</path>
