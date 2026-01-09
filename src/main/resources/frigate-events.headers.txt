@@ -1,0 +1,7 @@
+camera:	cam2
+event_id:	1767893358.676134-7b8x6s
+label:	car
+message_hash:	4efc73443606dbc091d9acded6f0b26b9cc27236130f88111ad770c6ea7efcb2
+source:	frigate-mqtt
+timestamp:	2026-01-08T17:29:29.084996Z
+type:	update

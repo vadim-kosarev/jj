@@ -1,0 +1,307 @@
+{
+    "type": "update",
+    "after": {
+        "id": "1766570135.595725-kbyohu",
+        "box": [
+            364,
+            235,
+            704,
+            426
+        ],
+        "area": 64940,
+        "label": "car",
+        "ratio": 1.780104712041885,
+        "score": 0.7890625,
+        "active": true,
+        "camera": "cam1",
+        "region": [
+            158,
+            0,
+            906,
+            748
+        ],
+        "end_time": null,
+        "has_clip": true,
+        "snapshot": {
+            "box": [
+                364,
+                235,
+                704,
+                426
+            ],
+            "area": 64940,
+            "score": 0.7890625,
+            "region": [
+                158,
+                0,
+                906,
+                748
+            ],
+            "path_data": [
+                [
+                    [
+                        0.7625,
+                        0.3889
+                    ],
+                    1766570138.787596
+                ],
+                [
+                    [
+                        0.7539,
+                        0.3917
+                    ],
+                    1766570138.983242
+                ],
+                [
+                    [
+                        0.6867,
+                        0.4292
+                    ],
+                    1766570139.993972
+                ],
+                [
+                    [
+                        0.6172,
+                        0.4708
+                    ],
+                    1766570140.568346
+                ],
+                [
+                    [
+                        0.5406,
+                        0.5194
+                    ],
+                    1766570141.057202
+                ],
+                [
+                    [
+                        0.4875,
+                        0.5528
+                    ],
+                    1766570141.177855
+                ]
+            ],
+            "attributes": [],
+            "frame_time": 1766570141.374987,
+            "velocity_angle": 0,
+            "current_estimated_speed": 0,
+            "recognized_license_plate": null,
+            "recognized_license_plate_score": null
+        },
+        "path_data": [
+            [
+                [
+                    0.7625,
+                    0.3889
+                ],
+                1766570138.787596
+            ],
+            [
+                [
+                    0.7539,
+                    0.3917
+                ],
+                1766570138.983242
+            ],
+            [
+                [
+                    0.6867,
+                    0.4292
+                ],
+                1766570139.993972
+            ],
+            [
+                [
+                    0.6172,
+                    0.4708
+                ],
+                1766570140.568346
+            ],
+            [
+                [
+                    0.5406,
+                    0.5194
+                ],
+                1766570141.057202
+            ],
+            [
+                [
+                    0.4875,
+                    0.5528
+                ],
+                1766570141.177855
+            ],
+            [
+                [
+                    0.4172,
+                    0.5917
+                ],
+                1766570141.374987
+            ]
+        ],
+        "sub_label": null,
+        "top_score": 0.828125,
+        "attributes": {},
+        "frame_time": 1766570141.374987,
+        "start_time": 1766570135.595725,
+        "stationary": false,
+        "has_snapshot": false,
+        "max_severity": "alert",
+        "current_zones": [],
+        "entered_zones": [],
+        "false_positive": false,
+        "velocity_angle": 0,
+        "motionless_count": 0,
+        "position_changes": 1,
+        "pending_loitering": false,
+        "current_attributes": [],
+        "average_estimated_speed": 0,
+        "current_estimated_speed": 0,
+        "recognized_license_plate": null
+    },
+    "before": {
+        "id": "1766570135.595725-kbyohu",
+        "box": [
+            476,
+            238,
+            772,
+            398
+        ],
+        "area": 47360,
+        "label": "car",
+        "ratio": 1.85,
+        "score": 0.84375,
+        "active": true,
+        "camera": "cam1",
+        "region": [
+            288,
+            0,
+            948,
+            660
+        ],
+        "end_time": null,
+        "has_clip": true,
+        "snapshot": {
+            "box": [
+                476,
+                238,
+                772,
+                398
+            ],
+            "area": 47360,
+            "score": 0.84375,
+            "region": [
+                288,
+                0,
+                948,
+                660
+            ],
+            "path_data": [
+                [
+                    [
+                        0.7625,
+                        0.3889
+                    ],
+                    1766570138.787596
+                ],
+                [
+                    [
+                        0.7539,
+                        0.3917
+                    ],
+                    1766570138.983242
+                ],
+                [
+                    [
+                        0.6867,
+                        0.4292
+                    ],
+                    1766570139.993972
+                ],
+                [
+                    [
+                        0.6172,
+                        0.4708
+                    ],
+                    1766570140.568346
+                ],
+                [
+                    [
+                        0.5406,
+                        0.5194
+                    ],
+                    1766570141.057202
+                ]
+            ],
+            "attributes": [],
+            "frame_time": 1766570141.177855,
+            "velocity_angle": 0,
+            "current_estimated_speed": 0,
+            "recognized_license_plate": null,
+            "recognized_license_plate_score": null
+        },
+        "path_data": [
+            [
+                [
+                    0.7625,
+                    0.3889
+                ],
+                1766570138.787596
+            ],
+            [
+                [
+                    0.7539,
+                    0.3917
+                ],
+                1766570138.983242
+            ],
+            [
+                [
+                    0.6867,
+                    0.4292
+                ],
+                1766570139.993972
+            ],
+            [
+                [
+                    0.6172,
+                    0.4708
+                ],
+                1766570140.568346
+            ],
+            [
+                [
+                    0.5406,
+                    0.5194
+                ],
+                1766570141.057202
+            ],
+            [
+                [
+                    0.4875,
+                    0.5528
+                ],
+                1766570141.177855
+            ]
+        ],
+        "sub_label": null,
+        "top_score": 0.828125,
+        "attributes": {},
+        "frame_time": 1766570141.177855,
+        "start_time": 1766570135.595725,
+        "stationary": false,
+        "has_snapshot": false,
+        "max_severity": "alert",
+        "current_zones": [],
+        "entered_zones": [],
+        "false_positive": false,
+        "velocity_angle": 0,
+        "motionless_count": 1,
+        "position_changes": 1,
+        "pending_loitering": false,
+        "current_attributes": [],
+        "average_estimated_speed": 0,
+        "current_estimated_speed": 0,
+        "recognized_license_plate": null
+    }
+}

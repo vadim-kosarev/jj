@@ -1,0 +1,14 @@
+Задача - сгенерить clichhouse таблицы для получения и хранения событий из RabitMQ.
+rabbit url: amqp://rgzz:rgzz@rabbitmq.rgzz:5672/rgzz
+queue name: q-frigate-events
+события должны приходить из очереди через engine clickhouse-rabbitmq - сгенерить код для принимающиего канала
+
+настройка кластера clickhouse - see docker-compose.yml
+пример сообытия - в файле frigate-events.headers.txt
+у события есть заголовки - пример в файле frigate-events.headers.txt
+
+создать таблицы в clickhouse для хранения событий из очереди RabbitMQ
+нужно в итоге видеть весь список событий в виде сырого json-а
+
+как результат - выдать список sql запросов для создания таблиц в clickhouse
+
