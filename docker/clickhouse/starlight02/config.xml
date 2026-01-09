@@ -48,7 +48,7 @@
         </users_xml>
     </user_directories>
     <logger>
-        <level>debug</level>
+        <level>information</level>
         <log>/var/log/clickhouse-server/clickhouse-server.log</log>
         <errorlog>/var/log/clickhouse-server/clickhouse-server.err.log</errorlog>
     </logger>

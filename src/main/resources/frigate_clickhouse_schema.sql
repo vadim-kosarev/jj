@@ -2,12 +2,7 @@
 
 CREATE table if not EXISTS frigate.q_frigate_events_mq
 (
-    `message_body` String,
-    _headers String,
-    _routing_key String,
-    _exchange String,
-    _message_id String,
-    _timestamp DateTime
+    `message_body` String
 )
     ENGINE = RabbitMQ
         SETTINGS rabbitmq_host_port = 'rabbitmq.rgzz:5672',
@@ -27,11 +22,6 @@ CREATE table if not EXISTS frigate.q_frigate_events_mq
 CREATE TABLE if not exists frigate.q_frigate_events_raw
 (
     `message_body` String,
-    _headers String,
-    _routing_key String,
-    _exchange String,
-    _message_id String,
-    _timestamp DateTime,
     `ingested_at` DateTime DEFAULT now()
 )
     ENGINE = MergeTree
@@ -43,11 +33,6 @@ create materialized view if not exists frigate.q_frigate_event_mv
             to frigate.q_frigate_events_raw
 as
 select
-    `message_body` ,
-    _headers ,
-    _routing_key ,
-    _exchange ,
-    _message_id ,
-    _timestamp
+    `message_body`
 from frigate.q_frigate_events_mq;
 
