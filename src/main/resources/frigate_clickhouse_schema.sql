@@ -36,8 +36,16 @@ SELECT lower(hex(sipHash128(message_body))) AS message_hash, -- или MD5(messa
        now()                    AS ingested_at
 FROM frigate.q_frigate_events_mq;
 
+
+
 OPTIMIZE TABLE frigate.q_frigate_events_raw FINAL;
 
-select * from frigate.q_frigate_events_raw FINAL;
+select message_hash, ingested_at, toString(message_body) as message_body
+from frigate.q_frigate_events_raw
+         FINAL
+order by ingested_at desc
+;
+
+
 
 
