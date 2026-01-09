@@ -1,7 +1,4 @@
 create database if not exists frigate;
-use frigate;
-
--- frigate.rabbitmq_events definition
 
 CREATE table if not EXISTS frigate.q_frigate_events_mq
 (
@@ -16,88 +13,119 @@ CREATE table if not EXISTS frigate.q_frigate_events_mq
             rabbitmq_num_consumers = 1,
             rabbitmq_skip_broken_messages = 0;
 
-
-CREATE TABLE IF NOT EXISTS frigate.q_frigate_events_raw
+CREATE TABLE IF NOT EXISTS frigate.frigate_events_raw_local ON CLUSTER my_cluster
 (
     `message_hash` FixedString(32),
     `message_body` JSON,
-    `ingested_at`  DateTime DEFAULT now()
+    `ingested_at`  DateTime DEFAULT now(),
+    `msg_camera`   LowCardinality(String) MATERIALIZED message_body.after.camera,
+    `msg_type`     LowCardinality(String) MATERIALIZED message_body.type,
+    `msg_id`       LowCardinality(String) MATERIALIZED message_body.after.id,
+    `start_time`   DateTime MATERIALIZED toDate(message_body.after.start_time)
 )
-    ENGINE = ReplacingMergeTree()
-        ORDER BY (message_hash);
--- для дедупликации с приоритетом свежей записи
+    ENGINE = ReplicatedReplacingMergeTree(
+            '/clickhouse/frigate/q_frigate_events/{shard}',
+            '{replica}')
+        PARTITION BY toYYYYMM(start_time)
+        ORDER BY message_hash
+        SETTINGS index_granularity = 8192;
 
--- MV
+CREATE TABLE IF NOT EXISTS frigate.d_frigate_events ON CLUSTER my_cluster
+(
+    `message_hash` FixedString(32),
+    `message_body` JSON,
+    `ingested_at`  DateTime,
+    `msg_camera`   LowCardinality(String),
+    `msg_type`     LowCardinality(String),
+    `msg_id`       LowCardinality(String),
+    `start_time`   DateTime
+)
+    ENGINE = Distributed('my_cluster',
+                         'frigate',
+                         'frigate_events_raw_local',
+                         sipHash64(message_hash));
+
+
 CREATE MATERIALIZED VIEW if not exists frigate.q_frigate_event_mv
-            to frigate.q_frigate_events_raw
+    to frigate.d_frigate_events
 AS
-SELECT lower(hex(sipHash128(message_body))) AS message_hash, -- или MD5(message_body)
+SELECT lower(hex(sipHash128(message_body))) AS message_hash,
        message_body,
-       now()                    AS ingested_at
+       now()                                AS ingested_at
 FROM frigate.q_frigate_events_mq;
 
+/* ================================================================================ */
 
-
-OPTIMIZE TABLE frigate.q_frigate_events_raw FINAL;
-
-
--- Denormalized table for analytical queries
-CREATE TABLE IF NOT EXISTS frigate.q_frigate_events_denorm
+CREATE TABLE IF NOT EXISTS frigate.frigate_events_denorm_local ON CLUSTER my_cluster
 (
-    `event_type` String,
-    `event_id` String,
-    `camera` String,
-    `label` String,
-    `score` Float32,
-    `active` Boolean,
-    `box_x1` Int32,
-    `box_y1` Int32,
-    `box_x2` Int32,
-    `box_y2` Int32,
-    `area` Int32,
-    `start_time` DateTime,
-    `frame_time` DateTime,
-    `top_score` Float32,
-    `velocity_angle` Float32,
-    `speed` Float32,
-    `license_plate` Nullable(String),
+    `event_type`        String,
+    `event_id`          String,
+    `camera`            String,
+    `label`             String,
+    `score`             Float32,
+    `active`            Boolean,
+    `box_x1`            Int32,
+    `box_y1`            Int32,
+    `box_x2`            Int32,
+    `box_y2`            Int32,
+    `area`              Int32,
+    `start_time`        DateTime,
+    `frame_time`        DateTime,
+    `top_score`         Float32,
+    `velocity_angle`    Float32,
+    `speed`             Float32,
+    `license_plate`     Nullable(String),
     `path_points_count` Int32,
-    `message_hash` FixedString(32),
-    `ingested_at` DateTime DEFAULT now()
+    `message_hash`      FixedString(32),
+    `ingested_at`       DateTime DEFAULT now()
 )
     ENGINE = ReplacingMergeTree()
+        PARTITION BY toYYYYMM(start_time)
         ORDER BY (message_hash);
 
+ENGINE = ReplicatedReplacingMergeTree(
+            '/clickhouse/frigate/frigate_events_denorm_local/{shard}',
+            '{replica}')
+        PARTITION BY toYYYYMM(start_time)
+        ORDER BY message_hash
+        SETTINGS index_granularity = 8192;
 
--- Materialized View for automatic JSON decomposition from raw events
 CREATE MATERIALIZED VIEW IF NOT EXISTS frigate.q_frigate_events_denorm_mv
+            ON CLUSTER my_cluster
             TO frigate.q_frigate_events_denorm
 AS
-SELECT
-    message_body.type as event_type,
-    message_body.after.id AS event_id,
-    message_body.after.camera AS camera,
-    message_body.after.label AS label,
-    message_body.after.score AS score,
-    message_body.after.active AS active,
-    message_body.after.box[1] AS box_x1,
-    message_body.after.box[2] AS box_y1,
-    message_body.after.box[3] AS box_x2,
-    message_body.after.box[4] AS box_y2,
-    message_body.after.area AS area,
-    toDateTime(message_body.after.start_time) AS start_time,
-    toDateTime(message_body.after.frame_time) AS frame_time,
-    message_body.after.top_score AS top_score,
-    message_body.after.velocity_angle AS velocity_angle,
-    message_body.after.current_estimated_speed AS speed,
-    message_body.after.recognized_license_plate AS license_plate,
-    length(message_body.after.path_data) AS path_points_count,
-    message_hash,
-    ingested_at
+SELECT message_body.type                           as event_type,
+       message_body.after.id                       AS event_id,
+       message_body.after.camera                   AS camera,
+       message_body.after.label                    AS label,
+       message_body.after.score                    AS score,
+       message_body.after.active                   AS active,
+       message_body.after.box[1]                   AS box_x1,
+       message_body.after.box[2]                   AS box_y1,
+       message_body.after.box[3]                   AS box_x2,
+       message_body.after.box[4]                   AS box_y2,
+       message_body.after.area                     AS area,
+       toDateTime(message_body.after.start_time)   AS start_time,
+       toDateTime(message_body.after.frame_time)   AS frame_time,
+       message_body.after.top_score                AS top_score,
+       message_body.after.velocity_angle           AS velocity_angle,
+       message_body.after.current_estimated_speed  AS speed,
+       message_body.after.recognized_license_plate AS license_plate,
+       length(message_body.after.path_data)        AS path_points_count,
+       message_hash,
+       ingested_at
 FROM frigate.q_frigate_events_raw
 ;
 
--- Example queries for analytics
--- SELECT * FROM frigate.q_frigate_events_denorm ORDER BY ingested_at DESC LIMIT 10;
--- SELECT camera, label, COUNT() as count, AVG(score) as avg_score FROM frigate.q_frigate_events_denorm GROUP BY camera, label ORDER BY count DESC;
--- SELECT camera, COUNT(DISTINCT event_id) as unique_events FROM frigate.q_frigate_events_denorm WHERE start_time > now() - INTERVAL 1 HOUR GROUP BY camera;
+
+CREATE VIEW if not exists frigate.v_frigate_events on cluster my_cluster
+AS
+SELECT message_hash,
+       ingested_at,
+       toString(message_body) AS message_body,
+       `msg_camera`,
+       `msg_type`,
+       `msg_id`,
+       `start_time`
+FROM frigate.d_frigate_events
+ORDER BY ingested_at DESC;
