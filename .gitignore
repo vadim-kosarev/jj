@@ -50,8 +50,12 @@ build/
 
 ### Commit helper files ###
 commit_info.txt
+commit_prep_info.txt
 commit_git_status.txt
 commit_git_work.txt
 commit_run.log
+
+### Temporary files ###
+tmp/
 
 
