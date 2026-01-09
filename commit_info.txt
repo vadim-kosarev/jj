@@ -1,15 +1,14 @@
 === COMMIT INFO ===
-Generated: The current date is: 09.01.2026 
-Enter the new date: (dd-mm-yy)
+Generated: 2026-01-09 11:09:08
 
 === COMMIT MESSAGE ===
 Refactor core logic: 1 file(s)
 Update documentation
 
 === FILES CHANGED ===
-A  commit_info.txt
-M  src/main/python/prepare_commit.py
+M  commit_info.txt
+D  src/main/python/__pycache__/prepare_commit.cpython-312.pyc
 
 
 === DIFF SUMMARY ===
-Lines changed: 43
+Lines changed: 32

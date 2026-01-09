@@ -37,3 +37,21 @@ out/
 .vscode/
 .env
 *.diff
+
+### Python ###
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+### Commit helper files ###
+commit_info.txt
+commit_git_status.txt
+commit_git_work.txt
+commit_run.log
+
+
