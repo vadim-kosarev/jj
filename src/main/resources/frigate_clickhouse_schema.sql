@@ -13,7 +13,7 @@ CREATE table if not EXISTS frigate.q_frigate_events_mq
             rabbitmq_num_consumers = 1,
             rabbitmq_skip_broken_messages = 0;
 
-CREATE TABLE IF NOT EXISTS frigate.frigate_events_raw_local ON CLUSTER my_cluster
+CREATE TABLE IF NOT EXISTS frigate.frigate_events_mq_local ON CLUSTER my_cluster
 (
     `message_hash` FixedString(32),
     `message_body` JSON,
@@ -21,16 +21,17 @@ CREATE TABLE IF NOT EXISTS frigate.frigate_events_raw_local ON CLUSTER my_cluste
     `msg_camera`   LowCardinality(String) MATERIALIZED message_body.after.camera,
     `msg_type`     LowCardinality(String) MATERIALIZED message_body.type,
     `msg_id`       LowCardinality(String) MATERIALIZED message_body.after.id,
+    `label`        LowCardinality(String) MATERIALIZED message_body.after.label,
     `start_time`   DateTime MATERIALIZED toDate(message_body.after.start_time)
 )
     ENGINE = ReplicatedReplacingMergeTree(
-            '/clickhouse/frigate/q_frigate_events/{shard}',
+            '/clickhouse/frigate/frigate_events_mq_local/{shard}',
             '{replica}')
         PARTITION BY toYYYYMM(start_time)
         ORDER BY message_hash
         SETTINGS index_granularity = 8192;
 
-CREATE TABLE IF NOT EXISTS frigate.d_frigate_events ON CLUSTER my_cluster
+CREATE TABLE IF NOT EXISTS frigate.frigate_events
 (
     `message_hash` FixedString(32),
     `message_body` JSON,
@@ -38,21 +39,34 @@ CREATE TABLE IF NOT EXISTS frigate.d_frigate_events ON CLUSTER my_cluster
     `msg_camera`   LowCardinality(String),
     `msg_type`     LowCardinality(String),
     `msg_id`       LowCardinality(String),
+    `label`        LowCardinality(String),
     `start_time`   DateTime
 )
     ENGINE = Distributed('my_cluster',
                          'frigate',
-                         'frigate_events_raw_local',
+                         'frigate_events_mq_local',
                          sipHash64(message_hash));
 
-
 CREATE MATERIALIZED VIEW if not exists frigate.q_frigate_event_mv
-    to frigate.d_frigate_events
+            to frigate.frigate_events_mq_local
 AS
 SELECT lower(hex(sipHash128(message_body))) AS message_hash,
        message_body,
        now()                                AS ingested_at
 FROM frigate.q_frigate_events_mq;
+
+CREATE VIEW if not exists frigate.v_frigate_events
+AS
+SELECT message_hash,
+       ingested_at,
+       toString(message_body) AS message_body,
+       `msg_camera`,
+       `msg_type`,
+       `msg_id`,
+       `label`,
+       `start_time`
+FROM frigate.frigate_events
+ORDER BY ingested_at DESC;
 
 /* ================================================================================ */
 
@@ -79,20 +93,43 @@ CREATE TABLE IF NOT EXISTS frigate.frigate_events_denorm_local ON CLUSTER my_clu
     `message_hash`      FixedString(32),
     `ingested_at`       DateTime DEFAULT now()
 )
-    ENGINE = ReplacingMergeTree()
-        PARTITION BY toYYYYMM(start_time)
-        ORDER BY (message_hash);
-
-ENGINE = ReplicatedReplacingMergeTree(
+    ENGINE = ReplicatedReplacingMergeTree(
             '/clickhouse/frigate/frigate_events_denorm_local/{shard}',
             '{replica}')
         PARTITION BY toYYYYMM(start_time)
         ORDER BY message_hash
         SETTINGS index_granularity = 8192;
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS frigate.q_frigate_events_denorm_mv
-            ON CLUSTER my_cluster
-            TO frigate.q_frigate_events_denorm
+CREATE TABLE IF NOT EXISTS frigate.frigate_events_denorm
+(
+    `event_type`        String,
+    `event_id`          String,
+    `camera`            String,
+    `label`             String,
+    `score`             Float32,
+    `active`            Boolean,
+    `box_x1`            Int32,
+    `box_y1`            Int32,
+    `box_x2`            Int32,
+    `box_y2`            Int32,
+    `area`              Int32,
+    `start_time`        DateTime,
+    `frame_time`        DateTime,
+    `top_score`         Float32,
+    `velocity_angle`    Float32,
+    `speed`             Float32,
+    `license_plate`     Nullable(String),
+    `path_points_count` Int32,
+    `message_hash`      FixedString(32),
+    `ingested_at`       DateTime
+)
+    ENGINE = Distributed('my_cluster',
+                         'frigate',
+                         'frigate_events_denorm_local',
+                         sipHash64(message_hash));
+
+create materialized view if not exists frigate_events_denorm_mv
+            to frigate.frigate_events_denorm_local
 AS
 SELECT message_body.type                           as event_type,
        message_body.after.id                       AS event_id,
@@ -114,18 +151,4 @@ SELECT message_body.type                           as event_type,
        length(message_body.after.path_data)        AS path_points_count,
        message_hash,
        ingested_at
-FROM frigate.q_frigate_events_raw
-;
-
-
-CREATE VIEW if not exists frigate.v_frigate_events on cluster my_cluster
-AS
-SELECT message_hash,
-       ingested_at,
-       toString(message_body) AS message_body,
-       `msg_camera`,
-       `msg_type`,
-       `msg_id`,
-       `start_time`
-FROM frigate.d_frigate_events
-ORDER BY ingested_at DESC;
+FROM frigate.d_frigate_events;
