@@ -1,6 +1,6 @@
 create database if not exists frigate;
 
-CREATE table if not EXISTS frigate.q_frigate_events_mq
+CREATE table if not EXISTS frigate.q_frigate_events_mq on cluster my_cluster
 (
     `message_body` JSON
 )
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS frigate.frigate_events_mq_local ON CLUSTER my_cluster
         ORDER BY message_hash
         SETTINGS index_granularity = 8192;
 
-CREATE TABLE IF NOT EXISTS frigate.frigate_events
+CREATE TABLE IF NOT EXISTS frigate.frigate_events on cluster my_cluster
 (
     `message_hash` FixedString(32),
     `message_body` JSON,
@@ -47,15 +47,16 @@ CREATE TABLE IF NOT EXISTS frigate.frigate_events
                          'frigate_events_mq_local',
                          sipHash64(message_hash));
 
-CREATE MATERIALIZED VIEW if not exists frigate.q_frigate_event_mv
-            to frigate.frigate_events_mq_local
+CREATE MATERIALIZED VIEW if not exists frigate.q_frigate_event_mv on cluster my_cluster
+--            to frigate.frigate_events_mq_local
+        to frigate.frigate_events
 AS
 SELECT lower(hex(sipHash128(message_body))) AS message_hash,
        message_body,
        now()                                AS ingested_at
 FROM frigate.q_frigate_events_mq;
 
-CREATE VIEW if not exists frigate.v_frigate_events
+CREATE VIEW if not exists frigate.v_frigate_events on cluster my_cluster
 AS
 SELECT message_hash,
        ingested_at,
@@ -152,3 +153,4 @@ SELECT message_body.type                           as event_type,
        message_hash,
        ingested_at
 FROM frigate.d_frigate_events;
+
