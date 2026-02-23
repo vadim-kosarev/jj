@@ -59,3 +59,5 @@ commit_run.log
 tmp/
 
 
+*.log
+src/**/*.csv

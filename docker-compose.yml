@@ -20,7 +20,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka1:2162
-      KAFKA_CLUSTER_ID: wmpq8imuMSadFpbyBzYIPg==   # любой случайный base64 длиной 22 символа
+      KAFKA_CLUSTER_ID: wmpq8imuMSadFpbyBzYIPg==
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
@@ -76,148 +76,38 @@ services:
 
   # ----------------------------------------------------------------------------------------------------------------------------------------
 
-  zookeeper:
-    image: zookeeper:latest
-    container_name: zookeeper
-    restart: unless-stopped
-    ports:
-      - "2181:2181"
-      - "2888:2888"
-      - "3888:3888"
-    environment:
-      - ZOO_CFG_EXTRA="server.1=0.0.0.0:2888:3888"
-      - ZOO_MY_ID=1
-      - SERVER_JVMFLAGS=-Dzookeeper.serverCnxnSocket=org.apache.zookeeper.server.NettyServerCnxnFactory
-    volumes:
-      - zookeeper_data:/var/lib/zookeeper/data
-      - zookeeper_logs:/var/log/zookeeper
-    networks:
-      - docker-network
-    healthcheck:
-      test: [ "CMD", "echo", "ruok", "|", "nc", "localhost", "2181" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  clickhouse-01:
+  clickhouse:
     image: clickhouse/clickhouse-server:latest
-    container_name: clickhouse-starlight-01
-    hostname: clickhouse-starlight-01
+    container_name: clickhouse
+    hostname: clickhouse.home
     restart: unless-stopped
     ports:
       - "8123:8123"
-      - "9363:9363"
       - "9000:9000"
+      - "9363:9363"
     volumes:
-      - ${CLICKHOUSE_CONFIG_DIR_01}/config.xml:/etc/clickhouse-server/config.xml
-      - ${CLICKHOUSE_CONFIG_DIR_01}/users.xml:/etc/clickhouse-server/users.xml
-      - ${CLICKHOUSE_CONFIG_DIR_01}/users.d:/etc/clickhouse-server/users.d
-      - ${CLICKHOUSE_CONFIG_DIR_01}/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - clickhouse_data_01:/var/lib/clickhouse
-    env_file:
-      - .env
-    networks:
-      - docker-network
-
-  clickhouse-02:
-    image: clickhouse/clickhouse-server:latest
-    container_name: clickhouse-starlight-02
-    hostname: clickhouse-starlight-02
-    restart: unless-stopped
-    ports:
-      - "8124:8123"
-      - "9364:9363"
-      - "9001:9000"
-    volumes:
-      - ${CLICKHOUSE_CONFIG_DIR_02}/config.xml:/etc/clickhouse-server/config.xml
-      - ${CLICKHOUSE_CONFIG_DIR_02}/users.xml:/etc/clickhouse-server/users.xml
-      - ${CLICKHOUSE_CONFIG_DIR_02}/users.d:/etc/clickhouse-server/users.d
-      - ${CLICKHOUSE_CONFIG_DIR_02}/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - clickhouse_data_02:/var/lib/clickhouse
-    env_file:
-      - .env
-    networks:
-      - docker-network
-
-  clickhouse-03:
-    image: clickhouse/clickhouse-server:latest
-    container_name: clickhouse-brightsky-01
-    hostname: clickhouse-brightsky-01
-    restart: unless-stopped
-    ports:
-      - "8125:8123"
-      - "9365:9363"
-      - "9002:9000"
-    volumes:
-      - ./docker/clickhouse/brightsky01/config.xml:/etc/clickhouse-server/config.xml
-      - ./docker/clickhouse/brightsky01/users.xml:/etc/clickhouse-server/users.xml
-      - ./docker/clickhouse/brightsky01/users.d:/etc/clickhouse-server/users.d
-      - ./docker/clickhouse/brightsky01/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - clickhouse_data_03:/var/lib/clickhouse
-    networks:
-      - docker-network
-
-  clickhouse-04:
-    image: clickhouse/clickhouse-server:latest
-    container_name: clickhouse-brightsky-02
-    hostname: clickhouse-brightsky-02
-    restart: unless-stopped
-    ports:
-      - "8126:8123"
-      - "9366:9363"
-      - "9003:9000"
-    volumes:
-      - ./docker/clickhouse/brightsky02/config.xml:/etc/clickhouse-server/config.xml
-      - ./docker/clickhouse/brightsky02/users.xml:/etc/clickhouse-server/users.xml
-      - ./docker/clickhouse/brightsky02/users.d:/etc/clickhouse-server/users.d
-      - ./docker/clickhouse/brightsky02/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - clickhouse_data_04:/var/lib/clickhouse
+      - ./docker/clickhouse/standalone/config.xml:/etc/clickhouse-server/config.d/custom.xml
+      - ./docker/clickhouse/standalone/users.xml:/etc/clickhouse-server/users.xml
+      - ./docker/clickhouse/standalone/users.d:/etc/clickhouse-server/users.d
+      - ./docker/clickhouse/standalone/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - clickhouse_data:/var/lib/clickhouse
+    ulimits:
+      nofile: 262144
     networks:
       - docker-network
 
   # ----------------------------------------------------------------------------------------------------------------------------------------
+
   redis:
     image: redis:latest
     container_name: redis
+    hostname: redis.home
     restart: unless-stopped
-    command: >
-      sh -c "
-      if [ \"$REDIS_ROLE\" = 'replica' ]; then
-        redis-server --replicaof redis-master.rgzz 6379 --appendonly yes --maxmemory 4gb --maxmemory-policy allkeys-lru;
-      else
-        redis-server --appendonly yes --maxmemory 4gb --maxmemory-policy allkeys-lru;
-      fi
-      "
+    command: redis-server --appendonly yes --maxmemory 4gb --maxmemory-policy allkeys-lru
     ports:
       - "6379:6379"
     volumes:
       - redis-data:/data
-    networks:
-      - docker-network
-
-  sentinel-1:
-    image: redis:latest
-    container_name: sentinel-1
-    restart: unless-stopped
-    command: redis-sentinel /etc/sentinel.conf
-    ports:
-      - "26379:26379"
-    volumes:
-      - ./docker/redis/sentinel.conf:/etc/sentinel.conf
-      - sentinel-1-tmp:/tmp
-    networks:
-      - docker-network
-
-  sentinel-2:
-    image: redis:latest
-    container_name: sentinel-2
-    restart: unless-stopped
-    command: redis-sentinel /etc/sentinel.conf
-    ports:
-      - "26380:26379"
-    volumes:
-      - ./docker/redis/sentinel.conf:/etc/sentinel.conf
-      - sentinel-2-tmp:/tmp
     networks:
       - docker-network
 
@@ -303,16 +193,9 @@ networks:
     external: true
 
 volumes:
-  zookeeper_data:
-  zookeeper_logs:
-  clickhouse_data_01:
-  clickhouse_data_02:
-  clickhouse_data_03:
-  clickhouse_data_04:
+  clickhouse_data:
   kafka1_data:
   redis-data:
-  sentinel-1-tmp:
-  sentinel-2-tmp:
   redis-insight-data:
   postgres_data:
   flowise_data:
