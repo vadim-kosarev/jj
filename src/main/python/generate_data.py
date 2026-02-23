@@ -1,7 +1,7 @@
 import time
 import random
 from datetime import datetime, timedelta
-from clickhouse_driver import Client
+from clickhouse_connect import Client
 
 client = Client(host="clickhouse-starlight-01", port=8123, database="default")
 # jdbc:clickhouse://clickhouse-starlight-01:8123
