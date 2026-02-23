@@ -10,7 +10,8 @@ services:
     hostname: kafka.rgzz
     restart: unless-stopped
     ports:
-      - "2160:2161"
+      - "2160:2160"
+      - "2161:2161"
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
