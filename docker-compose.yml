@@ -6,20 +6,20 @@ services:
 
   kafka1:
     image: apache/kafka:3.8.0
-    container_name: kafka1
-    hostname: kafka1
+    container_name: kafka
+    hostname: kafka.rgzz
     restart: unless-stopped
     ports:
       - "2160:2161"
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:2161,EXTERNAL://kafka.rgzz:2160
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka.rgzz:2161,EXTERNAL://kafka.rgzz:2160
       KAFKA_LISTENERS: INTERNAL://:2161,CONTROLLER://:2162,EXTERNAL://:2160
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka1:2162
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka.rgzz:2162
       KAFKA_CLUSTER_ID: wmpq8imuMSadFpbyBzYIPg==
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
@@ -51,9 +51,9 @@ services:
     command:
       - |
         echo "Creating Kafka topics..."
-        /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka1:2161 --create --if-not-exists --topic frigate-events --partitions 6 --replication-factor 1
+        /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka.rgzz:2161 --create --if-not-exists --topic frigate-events --partitions 6 --replication-factor 1
         echo "Topics created successfully."
-        /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka1:2161 --list
+        /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka.rgzz:2161 --list
     networks:
       - docker-network
 
@@ -65,7 +65,7 @@ services:
       - "8385:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: local-kraft
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka1:2161
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka.rgzz:2161
       KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL: PLAINTEXT
       DYNAMIC_CONFIG_ENABLED: true
     depends_on:
