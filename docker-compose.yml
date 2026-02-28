@@ -152,7 +152,7 @@ services:
     ports:
       - "3020:3000"
     environment:
-      - FLOWISE_CONFIG_DIR=/app/config
+      - FLOWISE_CONFIG_DIR=/root/.flowise/app/config
       #- FLOWISE_DATABASE_URL=postgresql://flowise:flowise@postgres.rgzz:5432/flowise
       - FLOWISE_USERNAME=admin
       - FLOWISE_PASSWORD=admin

@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS frigate.frigate_events_mq_local ON CLUSTER my_cluster
 )
     ENGINE = ReplicatedReplacingMergeTree(
             '/clickhouse/frigate/frigate_events_mq_local/{shard}',
-            '{replica}')
+            '{replica}',
+            ingested_at)
         PARTITION BY toYYYYMM(start_time)
         ORDER BY message_hash
         SETTINGS index_granularity = 8192;
@@ -48,8 +49,8 @@ CREATE TABLE IF NOT EXISTS frigate.frigate_events on cluster my_cluster
                          sipHash64(message_hash));
 
 CREATE MATERIALIZED VIEW if not exists frigate.q_frigate_event_mv on cluster my_cluster
---            to frigate.frigate_events_mq_local
-        to frigate.frigate_events
+            to frigate.frigate_events_mq_local
+-- NOTE: # to distributed table (to frigate.frigate) will not work! Confirmed by ClickHouse team.
 AS
 SELECT lower(hex(sipHash128(message_body))) AS message_hash,
        message_body,
@@ -96,7 +97,8 @@ CREATE TABLE IF NOT EXISTS frigate.frigate_events_denorm_local ON CLUSTER my_clu
 )
     ENGINE = ReplicatedReplacingMergeTree(
             '/clickhouse/frigate/frigate_events_denorm_local/{shard}',
-            '{replica}')
+            '{replica}',
+            ingested_at)
         PARTITION BY toYYYYMM(start_time)
         ORDER BY message_hash
         SETTINGS index_granularity = 8192;
@@ -152,5 +154,4 @@ SELECT message_body.type                           as event_type,
        length(message_body.after.path_data)        AS path_points_count,
        message_hash,
        ingested_at
-FROM frigate.d_frigate_events;
-
+FROM frigate.frigate_events;
