@@ -27,13 +27,13 @@ graph TD
     user[Пользователь]
 
     subgraph ds[Дашборды NN]
-        sa5-smosnnds03[sa5-smosnnds03\n192.168.5.179\nhttp://192.168.5.179:5601\nadmin]
+        sa5-smosnnds03[sa5-smosnnds03\n192.168.5.82\nhttp://192.168.5.82:5601\nadmin]
     end
 
     subgraph osnn["Кластер OpenSearch НН"]
         
         sa5-smosnnsbm[sa5-smosnnsbm
-            192.168.5.82
+            192.168.5.179
             master, data
         ]
         sa5-smosnnos01[sa5-smosnnos01
