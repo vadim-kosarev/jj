@@ -91,7 +91,7 @@ services:
       - ./docker/clickhouse/standalone/users.xml:/etc/clickhouse-server/users.xml
       - ./docker/clickhouse/standalone/users.d:/etc/clickhouse-server/users.d
       - ./docker/clickhouse/standalone/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - clickhouse_data:/var/lib/clickhouse
+      - ${CLICKHOUSE_STANDALONE_DATA_PATH}:/var/lib/clickhouse
     ulimits:
       nofile: 262144
     networks:
@@ -194,7 +194,6 @@ networks:
     external: true
 
 volumes:
-  clickhouse_data:
   kafka1_data:
   redis-data:
   redis-insight-data:
