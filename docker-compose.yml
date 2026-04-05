@@ -199,3 +199,4 @@ volumes:
   redis-insight-data:
   postgres_data:
   flowise_data:
+  clickhouse_data:
