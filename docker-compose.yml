@@ -5,7 +5,7 @@ services:
   # ----------------------------------------------------------------------------------------------------------------------------------------
 
   kafka1:
-    image: apache/kafka:3.8.0
+    image: apache/kafka:4.3.1
     container_name: kafka
     hostname: kafka.rgzz
     restart: unless-stopped
@@ -43,7 +43,7 @@ services:
       - docker-network
 
   kafka-init:
-    image: apache/kafka:3.8.0
+    image: apache/kafka:4.3.1
     container_name: kafka-init
     depends_on:
       kafka1:
@@ -99,6 +99,22 @@ services:
 
   # ----------------------------------------------------------------------------------------------------------------------------------------
 
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    hostname: otel-collector
+    restart: unless-stopped
+    command: [ "--config=/etc/otel-collector/config.yaml" ]
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    volumes:
+      - ./docker/otel-collector/config.yaml:/etc/otel-collector/config.yaml
+    networks:
+      - docker-network
+
+  # ----------------------------------------------------------------------------------------------------------------------------------------
+
   redis:
     image: redis:latest
     container_name: redis
@@ -130,15 +146,24 @@ services:
   langflow:
     depends_on:
       - postgres
-    image: langflowai/langflow:latest
+    image: langflowai/langflow:1.9.3
     container_name: langflow
     hostname: langflow.rgzz
     restart: unless-stopped
     ports:
       - "7860:7860"
     environment:
-      - LANGFLOW_CONFIG_DIR=/app/config
-      - LANGFLOW_DATABASE_URL=postgresql://langflow:langflow@postgres.rgzz:5432/langflow
+      - LANGFLOW_HOST=0.0.0.0
+      - LANGFLOW_PORT=7860
+      - LANGFLOW_DATABASE_URL=postgresql+psycopg://${LANGFLOW_DB_USER}:${LANGFLOW_DB_PASSWORD}@postgres.rgzz:5432/langflow
+      - LANGFLOW_SECRET_KEY=${LANGFLOW_SECRET_KEY}
+      - LANGFLOW_AUTO_LOGIN=true
+      - LANGFLOW_SUPERUSER=${LANGFLOW_SUPERUSER}
+      - LANGFLOW_SUPERUSER_PASSWORD=${LANGFLOW_SUPERUSER_PASSWORD}
+      - LANGFLOW_LANGUAGE=en
+      - LANGFLOW_FRONTEND_LANGUAGE=en
+    volumes:
+      - langflow_data:/app/.langflow
     networks:
       - docker-network
   # ----------------------------------------------------------------------------------------------------------------------------------------
@@ -153,15 +178,20 @@ services:
       - "3020:3000"
     environment:
       - FLOWISE_CONFIG_DIR=/root/.flowise/app/config
-      #- FLOWISE_DATABASE_URL=postgresql://flowise:flowise@postgres.rgzz:5432/flowise
-      - FLOWISE_USERNAME=admin
-      - FLOWISE_PASSWORD=admin
+      #- FLOWISE_DATABASE_URL=postgresql://${FLOWISE_DB_USER}:${FLOWISE_DB_PASSWORD}@postgres.rgzz:5432/flowise
       - DATABASE_TYPE=postgres
       - DATABASE_HOST=postgres.rgzz
       - DATABASE_PORT=5432
       - DATABASE_NAME=flowise
-      - DATABASE_USER=flowise
-      - DATABASE_PASSWORD=flowise
+      - DATABASE_USER=${FLOWISE_DB_USER}
+      - DATABASE_PASSWORD=${FLOWISE_DB_PASSWORD}
+      - FLOWISE_USERNAME=${FLOWISE_USERNAME}
+      - FLOWISE_PASSWORD=${FLOWISE_PASSWORD}
+      - DEBUG=true
+      - LOG_LEVEL=debug
+#      - HTTP_PROXY=http://${PROXY_USER}:${PROXY_PASSWORD}@${PROXY_HOST}:${PROXY_PORT}
+#      - HTTPS_PROXY=http://${PROXY_USER}:${PROXY_PASSWORD}@${PROXY_HOST}:${PROXY_PORT}
+#      - NO_PROXY=localhost,127.0.0.1,postgres.rgzz,host.docker.internal,172.0.0.0/8,10.0.0.0/8,192.168.0.0/16
     volumes:
       - flowise_data:/root/.flowise
     networks:
@@ -176,9 +206,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres_data:/var/lib/postgresql
@@ -199,4 +229,5 @@ volumes:
   redis-insight-data:
   postgres_data:
   flowise_data:
+  langflow_data:
   clickhouse_data:

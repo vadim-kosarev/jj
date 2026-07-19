@@ -1,30 +1,71 @@
-# ClickHouse Setup
+# jj
 
-## Connection to Main ClickHouse
+Домашняя песочница: Docker-стек с Kafka/ClickHouse/Redis/Postgres/Langflow/Flowise + Java-демо (Spring Boot) + вспомогательные Python-скрипты.
 
-To connect to the ClickHouse cluster, use one of the nodes:
+## Быстрый старт (для ленивых)
 
-- **STARLIGHT Node**: `http://clickhouse.starlight:8123` (HTTP) or `clickhouse.starlight:9000` (TCP)
-- **BRIGHTSKY Node**: `http://clickhouse.brightsky:8124` (HTTP) or `clickhouse.brightsky:9001` (TCP)
+```powershell
+# 1. выбрать конфиг под текущий хост (один раз, или при смене машины)
+Copy-Item .env.STARLIGHT .env -Force   # либо .env.BRIGHTSKY
 
-For distributed queries, create distributed tables pointing to the `my_cluster` cluster.
+# 2. внешняя сеть докера (если ещё не создана)
+docker network create docker-network
 
-Example connection using clickhouse-client:
+# 3. поднять весь стек
+docker compose up -d
+
+# 4. глянуть логи конкретного сервиса
+docker compose logs -f kafka1
+
+# 5. погасить
+docker compose down
 ```
-clickhouse-client --host clickhouse.starlight --port 9000 --user default --password password123
+
+Полная зачистка томов (**удаляет данные**, сверься с актуальными именами volume в `docker-compose.yml` — скрипт местами устарел):
+```powershell
+.\cleanup.cmd
 ```
 
-Or via HTTP:
+## Сервисы
+
+| Сервис       | Адрес                                                          | Что это                            |
+| ------------ | -------------------------------------------------------------- | ----------------------------------- |
+| Kafka        | `localhost:2160` (external), `kafka.rgzz:2161` (внутри сети)   | брокер, KRaft-режим, без Zookeeper  |
+| Kafka UI     | http://localhost:8385                                          | веб-морда кафки                     |
+| ClickHouse   | http://localhost:8123 (HTTP), `localhost:9000` (TCP)           | аналитическая БД                    |
+| OTel Collector | `localhost:4317` (gRPC), `localhost:4318` (HTTP)             | приёмник трейсов/метрик/логов (OTLP), пока просто логирует их в debug-экспортёр |
+| Redis        | `localhost:6379`                                               | кэш/стор                            |
+| RedisInsight | http://localhost:5540                                          | веб-морда Redis                     |
+| Postgres     | `localhost:5432`                                               | БД для Langflow и Flowise           |
+| Langflow     | http://localhost:7860                                          | no-code LLM оркестратор             |
+| Flowise      | http://localhost:3020                                          | no-code LLM оркестратор             |
+
+Логины/пароли — смотри `.env` (см. ниже).
+
+## Конфигурация и секреты
+
+- `.env` — активный конфиг, в `.gitignore`, не коммитится.
+- `.env.STARLIGHT` / `.env.BRIGHTSKY` — шаблоны под конкретные хосты, коммитятся в git, копируются в `.env`.
+- Все пароли/ключи (Postgres, Langflow, Flowise, прокси) лежат в `.env*`, `docker-compose.yml` их только подставляет через `${VAR}`.
+
+## Java-проект (`art`)
+
+Spring Boot 4 / Java 21, лежит в `src/main/java/home/art`.
+
+```powershell
+.\gradlew.bat bootRun   # запустить
+.\gradlew.bat build     # собрать
+.\gradlew.bat test      # тесты
 ```
-curl 'http://clickhouse.starlight:8123/?query=SELECT%201'
+
+## Python-скрипты
+
+`src/main/python` — генерация данных, пример Redis Cluster и т.п.:
+```powershell
+python src/main/python/generate_data.py
 ```
 
-## Tabix Web Interface
+## Прочее
 
-Tabix provides a web-based UI for querying ClickHouse.
-
-Access Tabix at: `http://localhost:8022`
-
-It connects to the local ClickHouse instance.
-
-The cluster is configured for sharding and replication across the two nodes.
+- `prepare_commit.py` — собирает `git status`/`diff` в `tmp/` для подготовки коммита.
+- `docker/postgres/init.sql` — создаёт БД/юзеров `langflow` и `flowise` при первом старте контейнера postgres.

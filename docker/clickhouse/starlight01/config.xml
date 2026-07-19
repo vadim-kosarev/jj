@@ -64,7 +64,7 @@
         <password>clickhouse</password>
     </interserver_http_credentials>
     <opentelemetry>
-        <endpoint>grpc://otel-collector.rgzz:4317</endpoint>
+        <endpoint>grpc://otel-collector:4317</endpoint>
         <service_name>clickhouse-starlight-01</service_name>
         <log_queries>1</log_queries>
         <log_processors>1</log_processors>
