@@ -14,6 +14,20 @@ exporters:
     verbosity: detailed
   debug/metrics:
     verbosity: basic
+  clickhouse:
+    endpoint: tcp://clickhouse:9000?dial_timeout=10s
+    database: otel
+    username: default
+    compress: lz4
+    async_insert: true
+    create_schema: true
+    ttl: 72h
+    timeout: 5s
+    retry_on_failure:
+      enabled: true
+      initial_interval: 5s
+      max_interval: 30s
+      max_elapsed_time: 300s
 
 service:
   pipelines:
@@ -24,7 +38,7 @@ service:
     metrics:
       receivers: [ otlp ]
       processors: [ batch ]
-      exporters: [ debug/metrics ]
+      exporters: [ debug/metrics, clickhouse ]
     logs:
       receivers: [ otlp ]
       processors: [ batch ]

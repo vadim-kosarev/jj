@@ -100,6 +100,8 @@ services:
   # ----------------------------------------------------------------------------------------------------------------------------------------
 
   otel-collector:
+    depends_on:
+      - clickhouse
     image: otel/opentelemetry-collector-contrib:latest
     container_name: otel-collector
     hostname: otel-collector

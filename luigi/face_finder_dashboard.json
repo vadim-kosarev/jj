@@ -1,0 +1,141 @@
+{
+  "__inputs": [],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "11.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "grafana-clickhouse-datasource",
+      "name": "ClickHouse",
+      "version": "4.0.0"
+    }
+  ],
+  "uid": "face-finder-otel",
+  "title": "face_finder / OTel metrics (ClickHouse)",
+  "description": "OTel metrics for the face_finder service, collected via otel-collector into ClickHouse (otel.otel_metrics_* tables).",
+  "tags": ["face_finder", "opentelemetry", "clickhouse"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "label": "ClickHouse instance",
+        "type": "datasource",
+        "query": "grafana-clickhouse-datasource",
+        "current": {},
+        "hide": 0,
+        "refresh": 1,
+        "multi": false
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Requests / events per minute",
+      "description": "sum(Count) per MetricName, from otel_metrics_histogram",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "short" },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${datasource}" },
+          "queryType": "sql",
+          "format": 1,
+          "refId": "A",
+          "rawSql": "SELECT\n  toStartOfMinute(TimeUnix) AS time,\n  MetricName AS metric,\n  sum(Count) AS requests\nFROM otel.otel_metrics_histogram\nWHERE ServiceName = 'face_finder' AND $__timeFilter(TimeUnix)\nGROUP BY time, metric\nORDER BY time"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Average duration per metric",
+      "description": "avg = sum(Sum) / sum(Count) per MetricName",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "s" },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${datasource}" },
+          "queryType": "sql",
+          "format": 1,
+          "refId": "A",
+          "rawSql": "SELECT\n  toStartOfMinute(TimeUnix) AS time,\n  MetricName AS metric,\n  sum(Sum) / sum(Count) AS avg_value\nFROM otel.otel_metrics_histogram\nWHERE ServiceName = 'face_finder' AND $__timeFilter(TimeUnix)\nGROUP BY time, metric\nORDER BY time"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "detection_duration_seconds: min / avg / max",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": { "unit": "s" },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${datasource}" },
+          "queryType": "sql",
+          "format": 1,
+          "refId": "A",
+          "rawSql": "SELECT\n  toStartOfMinute(TimeUnix) AS time,\n  min(Min) AS min_s,\n  sum(Sum) / sum(Count) AS avg_s,\n  max(Max) AS max_s\nFROM otel.otel_metrics_histogram\nWHERE ServiceName = 'face_finder' AND MetricName = 'detection_duration_seconds'\n  AND $__timeFilter(TimeUnix)\nGROUP BY time\nORDER BY time"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "table",
+      "title": "Metrics seen from face_finder",
+      "description": "Distinct metric names/units/attributes observed in the selected time range - useful to discover what's available",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 24 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${datasource}" },
+          "queryType": "sql",
+          "format": 1,
+          "refId": "A",
+          "rawSql": "SELECT DISTINCT MetricName, MetricUnit, Attributes\nFROM otel.otel_metrics_histogram\nWHERE ServiceName = 'face_finder' AND $__timeFilter(TimeUnix)"
+        }
+      ]
+    }
+  ]
+}
